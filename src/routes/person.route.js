@@ -11,7 +11,7 @@ router.post('/add', async(req, res)=>{
     try{
         const {name, lastname, age} = req.body;
         const newPerson = {
-            name, lastname, age
+            nome:name, sobrenome:lastname, idade:age
         }
         await pool.query('INSERT INTO usuarios SET ?', [newPerson])
         res.redirect('/list');
@@ -23,8 +23,9 @@ router.post('/add', async(req, res)=>{
 
 router.get('/list', async(req, res)=>{
     try{
-        const[result] = await pool.query("SELECT * FROM usuarios")
+        const[result] = await pool.query("SELECT nome as name, sobrenome as lastname, idade as age FROM usuarios")
         res.render('person/list', {person: result})
+        
     }
     catch(err){
         res.status(500).json({message:err.message});
@@ -34,7 +35,7 @@ router.get('/list', async(req, res)=>{
 router.get('/edit/:id', async(req, res)=>{
     try{
     const {id} = req.params;
-    const [person] = await pool.query('SELECT * FROM person WHERE id = ?', [id]);
+    const [person] = await pool.query('SELECT nome as name, sobrenome as lastname, idade as age FROM usuarios WHERE id = ?', [id]);
     const personEdit = person[0];
     res.render('person/edit', {person: personEdit});
 }
@@ -47,8 +48,8 @@ router.post('/edit/:id', async(req, res)=>{
     try{
         const {name, lastname, age} = req.body;
         const {id} = req.params;
-        const editPerson = {name, lastname, age};
-        await pool.query('UPDATE person SET ? WHERE id = ?', [editPerson, id]);
+        const editPerson = {nome:name, sobrenome:lastname, idade:age};
+        await pool.query('UPDATE usuarios SET ? WHERE id = ?', [editPerson, id]);
         res.redirect('/list');
     }
     catch(err){
@@ -59,7 +60,7 @@ router.post('/edit/:id', async(req, res)=>{
 router.get('/delete/:id', async(req, res)=>{
     try{
         const {id} = req.params;
-        await pool.query('DELETE FROM person WHERE id = ?', [id]);
+        await pool.query('DELETE FROM usuarios WHERE id = ?', [id]);
         res.redirect('/list');
     }
     catch(err){
